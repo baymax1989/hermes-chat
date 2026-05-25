@@ -1,7 +1,7 @@
 # Hermes Chat
 
 <p align="center">
-  <b>One HTML file. Full control of your AI agent.</b>
+  <b>一个轻量化 HTML 文件的节点式工作流 AI 控制台</b>
 </p>
 
 <p align="center">
