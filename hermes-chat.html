@@ -1599,6 +1599,8 @@ function activateAssistant(id) {
     if (asst.model) document.getElementById('modelSelect').value = asst.model;
     badge.textContent = asst.icon + ' ' + asst.name;
     badge.style.display = 'inline';
+    showToast('已激活：' + asst.name);
+    showPanel('sessions'); // 切回聊天
   }
   renderAssistants();
 }
