@@ -10,6 +10,22 @@
   <img src="https://img.shields.io/badge/deploy-zero_dependencies-lightgrey" alt="Deploy">
 </p>
 
+## Screenshots
+
+| Chat | Workflow |
+|------|----------|
+| ![Chat](screenshots/01-chat.png) | ![Workflow](screenshots/03-workflow.png) |
+
+| Skills | Assistants |
+|--------|------------|
+| ![Skills](screenshots/02-skills.png) | ![Assistants](screenshots/04-assistants.png) |
+
+| Digital Workers | Settings |
+|----------------|----------|
+| ![Workers](screenshots/05-workers.png) | ![Settings](screenshots/06-settings.png) |
+
+---
+
 Hermes Chat is a lightweight web GUI for [Hermes Agent](https://github.com/NousResearch/hermes-agent). Unlike Electron-based alternatives that weigh 500MB+, Hermes Chat is **a single HTML file + a Python proxy**. Zero npm, zero Docker, zero Electron.
 
 ---
