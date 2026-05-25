@@ -509,6 +509,23 @@ class ProxyHandler(http.server.SimpleHTTPRequestHandler):
                 self._json(200, {"ok": True, "output": output})
             except Exception as e:
                 self._json(200, {"ok": False, "error": str(e)})
+        elif self.path == "/api/upload":
+            content_type = self.headers.get('Content-Type', '')
+            if 'multipart/form-data' not in content_type:
+                self._json(400, {"ok": False, "error": "multipart required"})
+                return
+            import cgi, tempfile, io
+            form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': content_type})
+            item = form['file']
+            if not item or not item.filename:
+                self._json(400, {"ok": False, "error": "no file"})
+                return
+            upload_dir = os.path.expanduser("~/hermes_uploads")
+            os.makedirs(upload_dir, exist_ok=True)
+            fpath = os.path.join(upload_dir, item.filename)
+            with open(fpath, 'wb') as f:
+                f.write(item.file.read())
+            self._json(200, {"ok": True, "path": fpath, "name": item.filename})
         else:
             self._json(404, {})
 

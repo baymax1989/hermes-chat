@@ -127,6 +127,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", san
 .btn-test:hover { border-color: var(--accent); }
 .btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
 .btn-danger:hover { background: var(--danger); color: #fff; }
+/* Image previews in chat */
+.img-preview { max-width: 320px; max-height: 240px; border-radius: 8px; border: 1px solid var(--border); margin: 4px 0; cursor: pointer; }
+.img-preview-grid { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0; }
+.upload-toast { position: fixed; bottom: 80px; right: 20px; background: var(--accent); color: #000; padding: 8px 16px; border-radius: 8px; font-size: 12px; z-index: 50; animation: toastIn 0.3s ease; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 #testResult { font-size: 12px; }
 /* Workflow */
 .workflow-panel { display: none; flex: 1; flex-direction: column; padding: 16px; overflow: hidden; }
@@ -552,8 +557,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", san
   <div class="input-area" id="inputArea">
     <div class="usage-bar" id="usageBar"></div>
     <div class="input-wrap">
+      <button id="attachBtn" onclick="document.getElementById('fileInput').click()" title="上传文件/图片" style="background:none;border:1px solid var(--border);color:var(--dim);cursor:pointer;padding:4px 8px;border-radius:4px;font-size:13px">📎</button>
       <textarea id="input" data-i18n-placeholder="chat.placeholder" placeholder="输入消息… Enter 发送，Shift+Enter 换行" rows="1" onkeydown="onKeyDown(event)"></textarea>
       <button id="sendBtn" onclick="send()">发送</button>
+      <input type="file" id="fileInput" accept="image/*,.txt,.md,.json,.pdf,.py,.js,.html,.css" onchange="handleFileUpload(this.files)" style="display:none" multiple>
     </div>
   </div>
 </div>
@@ -1282,6 +1289,92 @@ function updateUsage() {
 }
 
 // ============ SEND ============
+let pendingImages = []; // base64 images waiting to be sent
+let pendingFiles = []; // uploaded files
+
+function handleFileUpload(files) {
+  if (!files || !files.length) return;
+  Array.from(files).forEach(f => {
+    if (f.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        // Resize if > 1MB
+        if (reader.result.length > 1024 * 1024) {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const scale = Math.min(1, (1024*1024) / reader.result.length * 1.5);
+            canvas.width = img.width * scale; canvas.height = img.height * scale;
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            pendingImages.push(canvas.toDataURL('image/jpeg', 0.8));
+            showImagePreview(canvas.toDataURL('image/jpeg', 0.8));
+          };
+          img.src = reader.result;
+        } else {
+          pendingImages.push(reader.result);
+          showImagePreview(reader.result);
+        }
+      };
+      reader.readAsDataURL(f);
+    } else {
+      uploadFile(f);
+    }
+  });
+}
+
+function showImagePreview(dataUrl) {
+  const chat = document.getElementById('chatArea');
+  if (chat.querySelector('.empty-state')) chat.innerHTML = '';
+  const wrapper = document.createElement('div');
+  wrapper.className = 'message user';
+  wrapper.innerHTML = `<img src="${dataUrl}" class="img-preview" onclick="window.open(this.src)">`;
+  chat.appendChild(wrapper);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function uploadFile(file) {
+  const form = new FormData();
+  form.append('file', file);
+  try {
+    const res = await fetch('/api/upload', { method: 'POST', body: form });
+    const data = await res.json();
+    if (data.ok) {
+      pendingFiles.push(data.path);
+      showToast('已上传: ' + file.name);
+    }
+  } catch(e) {
+    showToast('上传失败: ' + e.message);
+  }
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'upload-toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2000);
+}
+
+// Paste images
+document.addEventListener('paste', (e) => {
+  if (!document.getElementById('chatArea') || document.activeElement?.tagName === 'TEXTAREA') return;
+  const items = e.clipboardData?.items;
+  if (!items) return;
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      const file = item.getAsFile();
+      handleFileUpload([file]);
+    }
+  }
+});
+
+// Drag & drop
+const chatArea = document.getElementById('chatArea');
+chatArea.addEventListener('dragover', (e) => { e.preventDefault(); });
+chatArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  handleFileUpload(e.dataTransfer.files);
+});
+
 function onKeyDown(e) {
   const enterSend = (localStorage.getItem('hs_enter') || 'send') === 'send';
   if (e.key === 'Enter' && !e.shiftKey && enterSend) { e.preventDefault(); send(); }
@@ -1292,7 +1385,26 @@ async function send() {
   if (text.startsWith('/')) { handleSlash(text); input.value=''; return; }
   input.value=''; document.getElementById('sendBtn').disabled=true;
   const chat = document.getElementById('chatArea'); if (chat.querySelector('.empty-state')) chat.innerHTML='';
-  messages.push({role:'user',content:text}); addMessage('user',text);
+  // Build user message content — include images if any
+  let userContent = text;
+  if (pendingImages.length > 0 || pendingFiles.length > 0) {
+    const parts = [];
+    if (pendingFiles.length > 0) parts.push('[文件: ' + pendingFiles.join(', ') + ']');
+    parts.push(text);
+    if (pendingImages.length > 0) {
+      const contentArr = [{ type: 'text', text: parts.join('\n') }];
+      pendingImages.forEach(img => contentArr.push({ type: 'image_url', image_url: { url: img } }));
+      messages.push({ role: 'user', content: contentArr });
+      addMessage('user', parts.join('\n'));
+      pendingImages = []; pendingFiles = [];
+    } else {
+      userContent = parts.join('\n');
+      messages.push({role:'user',content:userContent}); addMessage('user',userContent);
+      pendingFiles = [];
+    }
+  } else {
+    messages.push({role:'user',content:text}); addMessage('user',text);
+  }
   const el = addMessage('assistant',''); const cel = el.querySelector('.content'); let full='';
   try {
     streaming=true;
