@@ -1429,11 +1429,22 @@ async function send() {
     });
     if(!res.ok) { full=`❌ API错误 (${res.status})`; cel.innerHTML=`<p style="color:var(--danger)">${full}</p>`; streaming=false; document.getElementById('sendBtn').disabled=false; return; }
     const reader = res.body.getReader(); const dec = new TextDecoder();
-    while(true) {
-      const {done,value}=await reader.read(); if(done) break;
-      const lines = dec.decode(value,{stream:true}).split('\n');
+    let streamDone = false;
+    while(!streamDone) {
+      let chunk;
+      try {
+        const {done,value}=await reader.read();
+        if(done) break;
+        chunk = value;
+      } catch(e) {
+        full += `\n\n⚠️ 响应中断: ${e.message}`;
+        break;
+      }
+      const lines = dec.decode(chunk,{stream:true}).split('\n');
       for(const line of lines) {
-        if(!line.startsWith('data: ')) continue; const d = line.slice(6); if(d==='[DONE]') break;
+        if(!line.startsWith('data: ')) continue;
+        const d = line.slice(6);
+        if(d==='[DONE]') { streamDone = true; break; }
         try { const j=JSON.parse(d); const c=j.choices?.[0]?.delta?.content; if(c){ full+=c; cel.innerHTML=renderMD(full); chat.scrollTop=chat.scrollHeight; }
         if(j.usage){ totalTokens.prompt+=j.usage.prompt_tokens||0; totalTokens.completion+=j.usage.completion_tokens||0; updateUsage(); } } catch{}
       }
