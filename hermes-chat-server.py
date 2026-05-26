@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Hermes Chat 本地服务器 — CORS + 技能 + Memory + 数字员工"""
 import http.server
+import http.client
 import urllib.request
 import urllib.parse
 import json
@@ -13,7 +14,33 @@ import time
 import uuid
 
 API_URL = os.environ.get("HERMES_API_URL", "http://127.0.0.1:8642")
-API_KEY = os.environ.get("HERMES_API_KEY", "")
+API_KEY = os.environ.get("API_SERVER_KEY", "")
+# 如果没设 API_SERVER_KEY，尝试从 config.yaml 读取
+if not API_KEY:
+    import yaml  # lazy import — only when needed
+    config_path = os.path.expanduser("~/.hermes/config.yaml")
+    if os.path.exists(config_path):
+        try:
+            with open(config_path) as f:
+                cfg = yaml.safe_load(f)
+            if isinstance(cfg, dict) and "API_SERVER_KEY" in cfg:
+                API_KEY = cfg["API_SERVER_KEY"]
+        except Exception:
+            pass
+# 最后尝试 .env 文件
+if not API_KEY:
+    env_path = os.path.expanduser("~/.hermes/.env")
+    if os.path.exists(env_path):
+        with open(env_path) as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith("API_SERVER_KEY=") and "***" not in line:
+                    API_KEY = line.split("=", 1)[1].strip('"').strip("'")
+                    break
+
+API_BASE = API_URL.rstrip("/")
+if API_BASE.endswith("/v1"):
+    API_BASE = API_BASE[:-3]
 PORT = int(os.environ.get("PORT", "8080"))
 HTML_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "hermes-chat.html")
 SKILLS_DIRS = [
@@ -549,7 +576,10 @@ class ProxyHandler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
 
     def _serve_html(self):
-        self.send_response(200); self.send_header("Content-Type", "text/html; charset=utf-8"); self.end_headers()
+        self.send_response(200); self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        self.send_header("Pragma", "no-cache"); self.send_header("Expires", "0")
+        self.end_headers()
         with open(HTML_FILE, "rb") as f: self.wfile.write(f.read())
 
     def _json(self, code, data):
@@ -566,20 +596,36 @@ class ProxyHandler(http.server.SimpleHTTPRequestHandler):
             body = None
             content_len = int(self.headers.get("Content-Length", 0))
             if content_len > 0: body = self.rfile.read(content_len)
-            url = f"{API_URL}{path}"
+            url = f"{API_BASE}{path}"
             req = urllib.request.Request(url, data=body, method=method)
             req.add_header("Authorization", f"Bearer {API_KEY}")
             req.add_header("Content-Type", self.headers.get("Content-Type", "application/json"))
             resp = urllib.request.urlopen(req)
             self.send_response(resp.status)
             self.send_header("Access-Control-Allow-Origin", "*")
-            self.send_header("Content-Type", resp.headers.get("Content-Type", "application/json"))
-            if resp.headers.get("Transfer-Encoding"): self.send_header("Transfer-Encoding", "chunked")
+            resp_content_type = resp.headers.get("Content-Type", "application/json")
+            self.send_header("Content-Type", resp_content_type)
+            # 只有上游明确返回 chunked 时才透传
+            is_stream = "text/event-stream" in resp_content_type
+            if is_stream:
+                self.send_header("Cache-Control", "no-cache")
+                self.send_header("Connection", "keep-alive")
             self.end_headers()
+            # 流式转发：逐块读取并立即写出
+            buffer_size = 1024 * 16
             while True:
-                chunk = resp.read(8192)
-                if not chunk: break
-                self.wfile.write(chunk); self.wfile.flush()
+                try:
+                    chunk = resp.read(buffer_size)
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+                    self.wfile.flush()
+                except http.client.IncompleteRead as ie:
+                    # IncompleteRead 在 SSE 流结束时正常发生
+                    if ie.partial:
+                        self.wfile.write(ie.partial)
+                        self.wfile.flush()
+                    break
         except Exception as e:
             self.send_response(502)
             self.send_header("Access-Control-Allow-Origin", "*")
@@ -593,7 +639,7 @@ if __name__ == "__main__":
     sched.start()
     server = http.server.HTTPServer(("127.0.0.1", PORT), ProxyHandler)
     print(f"🐱 Hermes Chat → http://localhost:{PORT}")
-    print(f"   代理 → {API_URL} | 数字员工引擎已启动")
+    print(f"   代理 → {API_BASE} | 数字员工引擎已启动")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

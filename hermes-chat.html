@@ -86,22 +86,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", san
 /* Memory Panel */
 .memory-panel { display: none; flex: 1; overflow-y: auto; padding: 24px; max-width: 900px; }
 .memory-panel.active { display: block; animation: panelIn 0.2s ease; }
-.assistants-panel { display:none;flex:1;overflow-y:auto;padding:24px;max-width:1100px; }
-.assistants-panel.active { display:block;animation:panelIn 0.2s ease; }
-.asst-card { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all 0.2s;position:relative; }
-.asst-card:hover { border-color:var(--accent); }
-.asst-card.active { border-color:var(--accent);box-shadow:0 0 0 1px var(--accent); }
-.asst-card .asst-icon { font-size:28px;margin-bottom:8px; }
-.asst-card .asst-name { font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px; }
-.asst-card .asst-desc { font-size:11px;color:#888;line-height:1.5;margin-bottom:8px; }
-.asst-card .asst-meta { display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:#666; }
-.asst-card .asst-meta span { padding:2px 6px;border-radius:3px;background:rgba(255,255,255,0.05); }
-.asst-card .asst-actions { position:absolute;top:8px;right:8px;display:flex;gap:4px;opacity:0;transition:opacity 0.2s; }
-.asst-card:hover .asst-actions { opacity:1; }
-.asst-card .asst-actions button { background:none;border:1px solid #444;color:#888;cursor:pointer;padding:2px 8px;border-radius:4px;font-size:10px; }
-.asst-card .asst-actions button:hover { border-color:var(--accent);color:var(--accent); }
-.asst-card .asst-actions .btn-del:hover { border-color:var(--danger);color:var(--danger); }
-#activeAsstBadge { font-size:11px;color:var(--accent);padding:2px 8px;border-radius:4px;background:rgba(255,215,0,0.08);margin-left:4px;display:none; }
+.assistants-panel { display: none; flex: 1; overflow-y: auto; padding: 24px; max-width: 1100px; }
+.assistants-panel.active { display: block; animation: panelIn 0.2s ease; }
+.asst-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.2s; position: relative; }
+.asst-card:hover { border-color: var(--accent); }
+.asst-card.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.asst-card .asst-icon { font-size: 28px; margin-bottom: 8px; }
+.asst-card .asst-name { font-weight: 700; font-size: 14px; color: var(--text); margin-bottom: 4px; }
+.asst-card .asst-desc { font-size: 11px; color: #888; line-height: 1.5; margin-bottom: 8px; }
+.asst-card .asst-meta { display: flex; gap: 6px; flex-wrap: wrap; font-size: 10px; color: #666; }
+.asst-card .asst-meta span { padding: 2px 6px; border-radius: 3px; background: rgba(255,255,255,0.05); }
+.asst-card .asst-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s; }
+.asst-card:hover .asst-actions { opacity: 1; }
+.asst-card .asst-actions button { background: none; border: 1px solid #444; color: #888; cursor: pointer; padding: 2px 8px; border-radius: 4px; font-size: 10px; }
+.asst-card .asst-actions button:hover { border-color: var(--accent); color: var(--accent); }
+.asst-card .asst-actions .btn-del:hover { border-color: var(--danger); color: var(--danger); }
+#activeAsstBadge { font-size: 11px; color: var(--accent); padding: 2px 8px; border-radius: 4px; background: rgba(255,215,0,0.08); margin-left: 4px; display: none; }
 .mem-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; transition: border-color 0.15s; }
 .mem-item:hover { border-color: #444; }
 .mem-item .mem-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
@@ -184,7 +184,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", san
 .btn-pause.paused { background: var(--green); }
 .btn-stop { background: var(--danger); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
 .btn-stop:hover { opacity: 0.85; }
-.wf-config { width: 240px; border-left: 1px solid var(--border); padding: 14px; background: var(--bg2); overflow-y: auto; flex-shrink: 0; font-size: 13px; }
+.wf-config { width: 300px; border-left: 1px solid var(--border); padding: 14px; background: var(--bg2); overflow-y: auto; flex-shrink: 0; font-size: 13px; }
 .wf-config h4 { margin-bottom: 12px; font-size: 14px; }
 .wf-conn-label { position: absolute; background: var(--bg2); border: 1px solid var(--accent); border-radius: 6px; padding: 6px 8px; display: flex; gap: 4px; z-index: 20; }
 .wf-conn-label input { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px; font-size: 12px; width: 140px; outline: none; }
@@ -225,17 +225,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", san
 .task-item .task-status.running { background: rgba(90,159,212,0.2); color: #5a9fd4; }
 .task-item .task-status.error { background: rgba(224,85,85,0.2); color: var(--danger); }
 .task-item .task-status.rejected { background: rgba(224,85,85,0.1); color: #999; }
-.model-tag { display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:var(--bg);border:1px solid var(--border);border-radius:14px;font-size:12px; }
-.model-tag .del { cursor:pointer;color:var(--danger);font-size:14px; }
-.tool-toggle { padding:6px 14px;border:1px solid var(--border);border-radius:14px;background:transparent;color:var(--dim);cursor:pointer;font-size:12px;transition:all 0.15s; }
-.tool-toggle:hover { border-color:var(--accent);color:var(--accent); }
-.tool-toggle.on { background:var(--green);color:#fff;border-color:var(--green); }
-.persona-panel { display:none;flex:1;overflow-y:auto;padding:24px;max-width:900px; }
-.persona-panel.active { display:block; animation: panelIn 0.2s ease; }
-.models-panel { display:none;flex:1;overflow-y:auto;padding:24px;max-width:700px; }
-.models-panel.active { display:block; animation: panelIn 0.2s ease; }
-.tools-panel { display:none;flex:1;overflow-y:auto;padding:24px;max-width:700px; }
-.tools-panel.active { display:block; animation: panelIn 0.2s ease; }
+.model-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; font-size: 12px; }
+.model-tag .del { cursor: pointer; color: var(--danger); font-size: 14px; }
+.tool-toggle { padding: 6px 14px; border: 1px solid var(--border); border-radius: 14px; background: transparent; color: var(--dim); cursor: pointer; font-size: 12px; transition: all 0.15s; }
+.tool-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.tool-toggle.on { background: var(--green); color: #fff; border-color: var(--green); }
+.persona-panel { display: none; flex: 1; overflow-y: auto; padding: 24px; max-width: 900px; }
+.persona-panel.active { display: block; animation: panelIn 0.2s ease; }
+.models-panel { display: none; flex: 1; overflow-y: auto; padding: 24px; max-width: 700px; }
+.models-panel.active { display: block; animation: panelIn 0.2s ease; }
+.tools-panel { display: none; flex: 1; overflow-y: auto; padding: 24px; max-width: 700px; }
+.tools-panel.active { display: block; animation: panelIn 0.2s ease; }
 /* Editor */
 .editor-panel { display: none; flex: 1; flex-direction: column; padding: 24px; overflow-y: auto; }
 .editor-panel.active { display: flex; }
@@ -422,7 +422,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", san
         <button class="refresh-btn" style="margin:0" onclick="saveAsPreset()" title="保存为预设">💾+</button>
         <button class="refresh-btn" style="margin:0" onclick="clearWorkflow()" data-i18n="wf.clear">清空</button>
         <button class="refresh-btn" style="margin:0" onclick="addWfNode()" data-i18n="wf.addNode">+ 节点</button>
-        <button class="refresh-btn" style="margin:0" onclick="autoLayoutWf()" title="自动排列节点">📐 自动排列</button>
+        <button class="refresh-btn" style="margin:0" onclick="autoLayoutWf()" title="保持当前列顺序，等距整理">📐 整理</button>
+        <button class="refresh-btn" style="margin:0" onclick="forceLayoutWf()" title="按执行顺序强制重排">📐 自动排列</button>
         <button class="refresh-btn" style="margin:0" onclick="loadPreset('article')" data-i18n="wf.preset">📝 文章写作预设</button>
       </div>
     </div>
@@ -448,7 +449,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", san
       </div>
       <!-- Node Config Panel -->
       <div class="wf-config" id="wfConfig" style="display:none">
-        <h4>⚙️ 节点配置</h4>
+        <h4 style="display:flex;justify-content:space-between;align-items:center">⚙️ 节点配置<button onclick="document.getElementById('wfConfig').style.display='none'" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:16px;padding:0 4px">×</button></h4>
         <div class="setting-row"><span>动作类型</span><select id="cfgAction" onchange="onActionChange()">
           <option value="search">🔍 搜索</option>
           <option value="extract">📄 提取网页</option>
@@ -460,7 +461,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", san
         </select></div>
         <div class="setting-row"><span>节点名称</span><input id="cfgName" placeholder="自定义名称"></div>
         <div class="setting-row"><span>任务描述</span><input id="cfgDesc" placeholder="描述任务，自动匹配相关 skill" style="max-width:100%" oninput="filterSkillByDesc()"></div>
-        <div class="setting-row"><span>关联 Skill</span><select id="cfgSkill"><option value="">不使用</option></select></div>
+        <div class="setting-row"><span>关联 Skill</span><div id="cfgSkillWrap" style="flex:1;position:relative;max-width:100%"><input id="cfgSkillSearch" placeholder="搜索或选择 skill…" oninput="filterCfgSkill()" onfocus="filterCfgSkill()" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:5px 28px 5px 8px;font-size:12px;outline:none"><span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--dim);font-size:10px">▼</span><div id="cfgSkillDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;max-height:180px;overflow-y:auto;background:var(--bg2);border:1px solid var(--accent);border-radius:0 0 6px 6px;z-index:50;margin-top:-1px"></div><input type="hidden" id="cfgSkill"></div></div>
         <div class="setting-row"><span>系统提示</span><textarea id="cfgPrompt" rows="3" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:12px;resize:vertical" placeholder="可用变量: {{input}} = 上游输出"></textarea></div>
         <div id="cfgParams"></div>
         <div class="setting-row"><span>Temperature</span><input id="cfgTemp" type="number" min="0" max="2" step="0.1" value="0.7"></div>
@@ -963,7 +964,7 @@ let editingSkill = null;
 function showPanel(name) {
   document.querySelectorAll('.act-btn').forEach(b => b.classList.remove('active'));
   // Hide all sub-panels
-  ['skillsPanel','memoryPanel','settingsPanel','editorPanel','workflowPanel','agentsPanel','modelsPanel','toolsPanel','personaPanel'].forEach(id => {
+  ['skillsPanel','memoryPanel','settingsPanel','editorPanel','workflowPanel','agentsPanel','modelsPanel','toolsPanel','personaPanel','assistantsPanel'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
   });
@@ -979,6 +980,18 @@ function showPanel(name) {
     if (panel.classList.contains('active')) {
       document.getElementById('chatArea').style.display = '';
       document.getElementById('inputArea').style.display = '';
+      // 重建图片预览（切换面板后 DOM 可能丢失）
+      if (pendingImages.length > 0) {
+        const chat = document.getElementById('chatArea');
+        if (chat.querySelector('.empty-state')) chat.innerHTML = '';
+        pendingImages.forEach(url => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'message user';
+          wrapper.innerHTML = `<img src="${url}" class="img-preview" onclick="window.open(this.src)">`;
+          chat.appendChild(wrapper);
+        });
+        chat.scrollTop = chat.scrollHeight;
+      }
       renderSessions(); setTimeout(() => walkI18N(), 50);
     }
     return;
@@ -1788,6 +1801,44 @@ function filterSkillByDesc() {
   }
   sel.value = currentVal;
 }
+function filterCfgSkill() {
+  const q = (document.getElementById('cfgSkillSearch').value || '').toLowerCase();
+  const dd = document.getElementById('cfgSkillDropdown');
+  const filtered = !q ? allSkills : allSkills
+    .filter(s => s.name.toLowerCase().includes(q))
+    .sort((a, b) => {
+      const an = a.name.toLowerCase(), bn = b.name.toLowerCase();
+      // Exact match first
+      const aEx = an === q ? 0 : 1, bEx = bn === q ? 0 : 1;
+      if (aEx !== bEx) return aEx - bEx;
+      // Starts with query next
+      const aSw = an.startsWith(q) ? 0 : 1, bSw = bn.startsWith(q) ? 0 : 1;
+      if (aSw !== bSw) return aSw - bSw;
+      // Then alphabetically
+      return an.localeCompare(bn);
+    });
+  if (filtered.length === 0) { dd.style.display = 'none'; return; }
+  dd.innerHTML = '<div style="padding:4px 8px;cursor:pointer;color:var(--dim);font-size:11px" onclick="selectCfgSkill(\'\');document.getElementById(\'cfgSkillSearch\').value=\'\';filterCfgSkill()">不使用</div>' +
+    filtered.slice(0, 50).map(s => `<div style="padding:4px 8px;cursor:pointer;font-size:12px;color:var(--text)" onmousedown="event.preventDefault()" onclick="selectCfgSkill('${s.name}');document.getElementById('cfgSkillSearch').value='${s.name}';document.getElementById('cfgSkillDropdown').style.display=\'none\'">${s.name}</div>`).join('');
+  dd.style.display = 'block';
+  // Highlight hover effect
+  dd.querySelectorAll('div').forEach(d => {
+    d.onmouseenter = () => d.style.background = 'var(--border)';
+    d.onmouseleave = () => d.style.background = '';
+  });
+}
+
+function selectCfgSkill(name) {
+  document.getElementById('cfgSkill').value = name;
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  if (!document.getElementById('cfgSkillWrap')?.contains(e.target)) {
+    const dd = document.getElementById('cfgSkillDropdown');
+    if (dd) dd.style.display = 'none';
+  }
+});
 function filterWfSkills() {
   const q = document.getElementById('wfSkillItems').previousElementSibling.value.toLowerCase();
   renderWfSkillList(q);
@@ -1852,12 +1903,18 @@ function renderWfNodes() {
       <div class="node-cat">${getActionIcon(n.action||'skill')} ${n.action||'skill'}${n.skill ? ' · '+n.skill : ''}</div>
       <div class="dot out" data-nid="${n.id}" onmousedown="onDotDown(event,${n.id},'out')"></div>
       <button class="node-run" onclick="event.stopPropagation();runSingleNode(${n.id})" title="试运行此节点">▶</button><button class="node-del" onclick="event.stopPropagation();deleteWfNode(${n.id})">×</button>`;
-    div.onmousedown = (e) => { if(e.target===div||e.target.classList.contains('node-title')||e.target.classList.contains('node-cat')) startDrag(e, n.id); };
+    let clickTimer = null;
+    div.onmousedown = (e) => {
+      // Ignore clicks on buttons and dots
+      if (e.target.classList.contains('node-run') || e.target.classList.contains('node-del') || e.target.classList.contains('dot')) return;
+      e.stopPropagation();
+      if (clickTimer) { clearTimeout(clickTimer); clickTimer = null; openNodeConfig(n.id); return; }
+      clickTimer = setTimeout(() => { clickTimer = null; startDrag(e, n.id); }, 300);
+    };
     div.addEventListener('click', (e) => { if (wfRunning && e.target !== div.querySelector('.node-run') && e.target !== div.querySelector('.node-del')) { e.stopPropagation(); showNodeInResults(n.id); } });
         const stats = document.createElement('div');
     stats.className = 'node-stats';
     div.appendChild(stats);
-    div.ondblclick = (e) => { e.stopPropagation(); openNodeConfig(n.id); };
     container.appendChild(div);
   });
   updateWfTransform();
@@ -1958,14 +2015,15 @@ function onDotDown(e, nid, type) {
 
 function startDrag(e, id) {
   if (panning) return;
+  const el = e.currentTarget;
+  const rect = el.getBoundingClientRect();
   // If dragging unselected node, clear selection
   if (!selectedNodes.has(id)) { selectedNodes.clear(); selectedNodes.add(id); renderWfNodes(); }
   dragNode = wfNodes.find(n => n.id === id);
   if (!dragNode) return;
-  const el = e.currentTarget;
-  el.classList.add('dragging');
-  dragOffX = (e.clientX - el.getBoundingClientRect().left) / wfZoom;
-  dragOffY = (e.clientY - el.getBoundingClientRect().top) / wfZoom;
+  // IMPORTANT: compute offsets from saved rect (renderWfNodes may have recreated DOM)
+  dragOffX = (e.clientX - rect.left) / wfZoom;
+  dragOffY = (e.clientY - rect.top) / wfZoom;
   e.preventDefault();
 }
 
@@ -1981,17 +2039,19 @@ function onCanvasMove(e) {
   if (dragNode) {
     const canvas = document.getElementById('wfCanvas');
     const cr = canvas.getBoundingClientRect();
-    const dx = (e.clientX - cr.left - wfPanX) / wfZoom - dragOffX - dragNode.x;
-    const dy = (e.clientY - cr.top - wfPanY) / wfZoom - dragOffY - dragNode.y;
-    // Move dragged node
-    dragNode.x += dx; dragNode.y += dy;
-    const el = document.getElementById('wfTransform').querySelector(`[data-id="${dragNode.id}"]`);
-    if (el) { el.style.left = dragNode.x + 'px'; el.style.top = dragNode.y + 'px'; }
-    // Move all selected nodes together
+    const newX = (e.clientX - cr.left - wfPanX) / wfZoom - dragOffX;
+    const newY = (e.clientY - cr.top - wfPanY) / wfZoom - dragOffY;
+    // Move all selected nodes by the delta
+    const dx = newX - dragNode.x;
+    const dy = newY - dragNode.y;
     selectedNodes.forEach(sid => {
-      if (sid === dragNode.id) return;
       const sn = wfNodes.find(n => n.id === sid);
-      if (sn) { sn.x += dx; sn.y += dy;
+      if (sn) { sn.x += dx; sn.y += dy; }
+    });
+    // Update DOM positions
+    selectedNodes.forEach(sid => {
+      const sn = wfNodes.find(n => n.id === sid);
+      if (sn) {
         const sel = document.getElementById('wfTransform').querySelector(`[data-id="${sid}"]`);
         if (sel) { sel.style.left = sn.x + 'px'; sel.style.top = sn.y + 'px'; }
       }
@@ -2045,7 +2105,11 @@ function onCanvasUp(e) {
     if (Math.abs(rx-lx) > 5 || Math.abs(ry-ly) > 5) {
       if (!e.shiftKey) selectedNodes.clear();
       wfNodes.forEach(n => {
-        if (n.x >= lx && n.x + 150 <= rx && n.y >= ly && n.y + 60 <= ry) {
+        const el = document.getElementById('wfTransform').querySelector(`[data-id="${n.id}"]`);
+        if (!el) return;
+        const nw = el.offsetWidth, nh = el.offsetHeight;
+        // Check rectangle intersection
+        if (n.x < rx && n.x + nw > lx && n.y < ry && n.y + nh > ly) {
           selectedNodes.add(n.id);
         }
       });
@@ -2092,6 +2156,9 @@ function onCanvasDown(e) {
     let lassoEl = document.getElementById('wfLasso');
     if (!lassoEl) { lassoEl = document.createElement('div'); lassoEl.id = 'wfLasso'; lassoEl.className = 'wf-lasso'; canvas.appendChild(lassoEl); }
     lassoEl.style.display = 'block';
+    lassoEl.style.left = (lassoStartX * wfZoom + wfPanX) + 'px';
+    lassoEl.style.top = (lassoStartY * wfZoom + wfPanY) + 'px';
+    lassoEl.style.width = '0px'; lassoEl.style.height = '0px';
     drawWf();
   }
 }
@@ -2123,6 +2190,7 @@ function clearWorkflow() {
 let configNodeId = null;
 
 function openNodeConfig(id) {
+  try {
   configNodeId = id;
   const node = wfNodes.find(n => n.id === id);
   if (!node) return;
@@ -2132,10 +2200,10 @@ function openNodeConfig(id) {
   document.getElementById('cfgPrompt').value = node.prompt || '';
   document.getElementById('cfgTemp').value = node.temp ?? 0.7;
   document.getElementById('cfgTokens').value = node.maxTokens ?? 1000;
-  // Populate skill selector
-  const sel = document.getElementById('cfgSkill');
-  sel.innerHTML = '<option value="">不使用</option>' + allSkills.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
-  sel.value = node.skill || '';
+  // Set skill value
+  document.getElementById('cfgSkill').value = node.skill || '';
+  document.getElementById('cfgSkillSearch').value = node.skill || '';
+  document.getElementById('cfgSkillDropdown').style.display = 'none';
   // Params
   node.params = node.params || {};
   onActionChange();
@@ -2144,6 +2212,8 @@ function openNodeConfig(id) {
   if (node.action === 'write') document.getElementById('cfgFilePath').value = node.params.filepath || '';
   if (node.action === 'terminal') document.getElementById('cfgCommand').value = node.params.command || '';
   document.getElementById('wfConfig').style.display = '';
+  document.getElementById('wfConfig').scrollIntoView({behavior:'smooth',block:'nearest'});
+  } catch(e) { console.error('openNodeConfig error:', e); }
 }
 
 function onActionChange() {
@@ -2159,7 +2229,7 @@ function onActionChange() {
   }
   // Show/hide skill selector based on action type
   const needsSkill = (action === 'skill');
-  document.getElementById('cfgSkill').parentElement.style.display = needsSkill ? '' : 'none';
+  document.getElementById('cfgSkillWrap').style.display = needsSkill ? '' : 'none';
   document.getElementById('cfgPrompt').parentElement.style.display = action === 'custom' ? '' : 'none';
   
   const params = node?.params || {};
@@ -2300,7 +2370,7 @@ function autoSaveWorkflow() {
 // ===== Presets =====
 function autoLayoutWf() {
   if (wfNodes.length === 0) return;
-  // Preserve layout shape — normalize spacing with border-to-border gaps
+  // Group by current X position (preserve user's column order)
   const sorted = [...wfNodes].sort((a,b) => a.x - b.x);
   const cols = [];
   for (const n of sorted) {
@@ -2310,18 +2380,77 @@ function autoLayoutWf() {
     }
     if (!placed) cols.push([n]);
   }
-  const NODE_H = 75; // typical node height with desc
-  // Within each column: sort by Y, space with border gap
-  const GAP = 30, START_Y = 20;
+  // First pass: rough render to get actual DOM sizes
+  const START_Y = 20, GAP = 24;
   cols.forEach(col => {
     col.sort((a,b) => a.y - b.y);
-    col.forEach((n, i) => { n.y = START_Y + i * (NODE_H + GAP); });
+    col.forEach((n, i) => { n.y = START_Y + i * 90; n.x = 40; });
   });
-  // Between columns: space evenly
-  const GAP_X = 250, START_X = 40;
-  cols.forEach((col, ci) => {
-    col.forEach(n => { n.x = START_X + ci * GAP_X; });
+  renderWfNodes();
+  // Measure actual node heights per column, position Y with border-to-border gaps
+  cols.forEach(col => {
+    col.sort((a,b) => a.y - b.y);
+    let cy = START_Y;
+    col.forEach(n => {
+      const el = document.getElementById('wfTransform').querySelector(`[data-id="${n.id}"]`);
+      const h = el ? el.offsetHeight : 75;
+      n.y = cy; cy += h + GAP;
+    });
   });
+  // Measure column widths, position X with border-to-border gaps
+  let cx = 40;
+  cols.forEach(col => {
+    let maxW = 150;
+    col.forEach(n => {
+      const el = document.getElementById('wfTransform').querySelector(`[data-id="${n.id}"]`);
+      if (el && el.offsetWidth > maxW) maxW = el.offsetWidth;
+    });
+    col.forEach(n => { n.x = cx; });
+    cx += maxW + GAP + 60; // 60px extra for connection ports
+  });
+  renderWfNodes(); drawWf(); autoSaveWorkflow();
+  wfZoom = 1; wfPanX = 0; wfPanY = 0; updateWfTransform(); drawWf();
+}
+
+function forceLayoutWf() {
+  if (wfNodes.length === 0) return;
+  // Adaptive grid: 3×3(≤9) → 4×4(≤16) → 5×5(≤25) → ...
+  const COLS = Math.ceil(Math.sqrt(wfNodes.length));
+  const START_X = 40, START_Y = 20, GAP = 24;
+  const rows = [];
+  for (let i = 0; i < wfNodes.length; i += COLS) rows.push(wfNodes.slice(i, i + COLS));
+  // Rough render
+  rows.forEach((row, ri) => row.forEach((n, ci) => { n.x = START_X + ci * 250; n.y = START_Y + ri * 90; }));
+  renderWfNodes();
+  // Measure DOM → position with border gaps
+  rows.forEach((row, ri) => {
+    let cy = START_Y;
+    if (ri > 0) {
+      const prevRow = rows[ri-1];
+      const prevMaxH = Math.max(...prevRow.map(n => {
+        const el = document.getElementById('wfTransform').querySelector(`[data-id="${n.id}"]`);
+        return el ? el.offsetHeight : 75;
+      }));
+      cy = rows[ri-1][0].y + prevMaxH + GAP;
+    }
+    row.forEach(n => { n.y = cy; });
+  });
+  const colWidths = [];
+  for (let ci = 0; ci < COLS; ci++) {
+    let maxW = 150;
+    wfNodes.forEach((n, i) => {
+      if (i % COLS === ci) {
+        const el = document.getElementById('wfTransform').querySelector(`[data-id="${n.id}"]`);
+        if (el && el.offsetWidth > maxW) maxW = el.offsetWidth;
+      }
+    });
+    colWidths[ci] = maxW;
+  }
+  let cx = START_X;
+  for (let ci = 0; ci < COLS; ci++) {
+    wfNodes.forEach((n, i) => { if (i % COLS === ci) n.x = cx; });
+    cx += colWidths[ci] + GAP + 60;
+  }
   renderWfNodes(); drawWf(); autoSaveWorkflow();
   wfZoom = 1; wfPanX = 0; wfPanY = 0; updateWfTransform(); drawWf();
 }
@@ -2751,7 +2880,6 @@ async function runWorkflow(startNodeId) {
     
     // Apply variable resolution
     prompt = resolveVars(prompt, nodeResults, context);
-    messages.push({ role: 'user', content: prompt });
     
     try {
       let output;
@@ -2791,7 +2919,6 @@ async function runWorkflow(startNodeId) {
       nodeResults[node.id] = { output, error: null, ts: Date.now() };
       wfStatus[nid] = { status: 'done', elapsed: (Date.now() - _startTime) / 1000, output, error: null };
       if (nodeEl) { const stats = nodeEl.querySelector('.node-stats'); if (stats) stats.innerHTML = '<span style="color:var(--green)">✓</span> ' + ((Date.now() - _startTime) / 1000).toFixed(1) + 's'; }
-      messages.push({ role: 'assistant', content: output });
     } catch(e) {
       if (nodeEl) { nodeEl.classList.remove('running'); nodeEl.classList.add('error'); }
       results.push({ name: node.name, output: null, error: e.message });
@@ -3063,7 +3190,7 @@ function switchModel() {
 }
 
 // ============ INIT ============
-function init() { renderSessions(); document.getElementById('input').focus(); }
+function init() { renderSessions(); loadSkills(); document.getElementById('input').focus(); }
 init();
 </script>
 </body>

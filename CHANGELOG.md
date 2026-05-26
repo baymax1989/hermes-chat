@@ -1,5 +1,33 @@
 # Changelog
 
+## [v2.1] — 2026-05-26
+
+> Bug 修复版本：全面排查并修复所有已知问题，优化架构可靠性。
+
+### Bug 修复
+
+**高优先级**
+- 修复 API 认证问题：Gateway 使用 `API_SERVER_KEY` 认证（之前误用 `HERMES_API_KEY`），增加三级回退链（环境变量 → config.yaml → .env）
+- 修复代理路径双 `/v1` 拼接：`_proxy` 方法中 URL 拼接导致 `https://api.deepseek.com/v1/v1/chat/completions`，引入 `API_BASE` 去重逻辑
+- 修复页面切换残留：`showPanel` 隐藏面板列表缺少 `assistantsPanel`，导致助手面板 UI 残留到其他页面
+
+**中优先级**
+- 修复工作流消息污染：`runWorkflow` 执行时将内部通信 push 到主聊天 `messages`，现已移除，工作流输出仅保留在 `nodeResults` 中
+- 修复图片预览丢失：切换到聊天面板时自动从 `pendingImages` 重建预览 DOM
+
+**低优先级**
+- 优化 SSE 流式代理：`_proxy` 方法改用 `http.client.IncompleteRead` 捕获机制，避免流结束时报错
+- 修复 chunked header 误透传：仅当上游返回 `text/event-stream` 时才设置流式 header
+- 统一 CSS 缩进格式：修复 `assistants-panel`、`asst-card`、`model-tag`、`tool-toggle` 等区域的缩进不一致
+
+### 技术改进
+
+- `_proxy` 方法：流式转发缓冲区从 8KB 提升至 16KB，提高吞吐
+- `showPanel`：隐藏面板列表自动包含所有面板，杜绝遗漏
+- 删除工作流中 2 处 `messages.push` 调用（`prompt` 和 `output`），避免聊天记录污染
+
+---
+
 ## [v2.0] — 2026-05-26
 
 > 集成版本，从核心对话升级为完整节点式工作流平台。
