@@ -170,7 +170,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", san
 .wf-node.running { border-color: var(--accent); animation: wfPulse 0.8s infinite; }
 .wf-node.done { border-color: var(--green); opacity: 0.7; }
 .wf-node.error { border-color: var(--danger); }
+.wf-node.selected { border-color: #5a9fd4 !important; box-shadow: 0 0 8px rgba(90,159,212,0.4); }
 @keyframes wfPulse { 0%,100% { box-shadow: 0 0 8px rgba(255,215,0,0.3); } 50% { box-shadow: 0 0 20px rgba(255,215,0,0.6); } }
+.wf-lasso { position: absolute; border: 1px dashed #5a9fd4; background: rgba(90,159,212,0.08); pointer-events: none; z-index: 15; display: none; }
 .wf-skill-list { width: 220px; border-right: 1px solid var(--border); padding: 8px; overflow-y: auto; flex-shrink: 0; }
 .wf-skill-item { padding: 6px 8px; cursor: pointer; border-radius: 4px; font-size: 12px; color: var(--dim); margin-bottom: 2px; }
 .wf-skill-item:hover { background: var(--border); color: var(--text); }
@@ -1715,6 +1717,8 @@ let dragOffX = 0, dragOffY = 0;
 let wfZoom = 1;
 let wfPanX = 0, wfPanY = 0;
 let panning = false, panStartX = 0, panStartY = 0;
+let lassoing = false, lassoStartX = 0, lassoStartY = 0, lassoEndX = 0, lassoEndY = 0;
+let selectedNodes = new Set(); // multi-select
 
 function showWorkflow() {
   document.getElementById('btnRunWf').disabled = false;
@@ -1837,7 +1841,7 @@ function renderWfNodes() {
   container.querySelectorAll('.wf-node').forEach(n => n.remove());
   wfNodes.forEach(n => {
     const div = document.createElement('div');
-    div.className = 'wf-node action-' + (n.action||'skill');
+    div.className = 'wf-node action-' + (n.action||'skill') + (selectedNodes.has(n.id) ? ' selected' : '');
     div.style.left = n.x + 'px';
     div.style.top = n.y + 'px';
     div.setAttribute('data-id', n.id);
@@ -1929,13 +1933,6 @@ function onCanvasUp(e) {
     dragNode = null;
   }
 }
-function onCanvasDown(e) {
-  if (e.target === document.getElementById('wfCanvas') || e.target.id === 'wfSvg') {
-    connectFrom = null; drawWf();
-  }
-}
-
-// Action icons
 function getActionIcon(a) {
   const m = {skill:'🧩',search:'🔍',extract:'📄',analyze:'💬',write:'💾',terminal:'💻',custom:'🛠'};
   return m[a] || '🧩';
@@ -1961,6 +1958,8 @@ function onDotDown(e, nid, type) {
 
 function startDrag(e, id) {
   if (panning) return;
+  // If dragging unselected node, clear selection
+  if (!selectedNodes.has(id)) { selectedNodes.clear(); selectedNodes.add(id); renderWfNodes(); }
   dragNode = wfNodes.find(n => n.id === id);
   if (!dragNode) return;
   const el = e.currentTarget;
@@ -1982,10 +1981,38 @@ function onCanvasMove(e) {
   if (dragNode) {
     const canvas = document.getElementById('wfCanvas');
     const cr = canvas.getBoundingClientRect();
-    dragNode.x = (e.clientX - cr.left - wfPanX) / wfZoom - dragOffX;
-    dragNode.y = (e.clientY - cr.top - wfPanY) / wfZoom - dragOffY;
+    const dx = (e.clientX - cr.left - wfPanX) / wfZoom - dragOffX - dragNode.x;
+    const dy = (e.clientY - cr.top - wfPanY) / wfZoom - dragOffY - dragNode.y;
+    // Move dragged node
+    dragNode.x += dx; dragNode.y += dy;
     const el = document.getElementById('wfTransform').querySelector(`[data-id="${dragNode.id}"]`);
     if (el) { el.style.left = dragNode.x + 'px'; el.style.top = dragNode.y + 'px'; }
+    // Move all selected nodes together
+    selectedNodes.forEach(sid => {
+      if (sid === dragNode.id) return;
+      const sn = wfNodes.find(n => n.id === sid);
+      if (sn) { sn.x += dx; sn.y += dy;
+        const sel = document.getElementById('wfTransform').querySelector(`[data-id="${sid}"]`);
+        if (sel) { sel.style.left = sn.x + 'px'; sel.style.top = sn.y + 'px'; }
+      }
+    });
+    dragOffX = (e.clientX - cr.left - wfPanX) / wfZoom - dragNode.x;
+    dragOffY = (e.clientY - cr.top - wfPanY) / wfZoom - dragNode.y;
+  }
+  if (lassoing) {
+    const canvas = document.getElementById('wfCanvas');
+    const cr = canvas.getBoundingClientRect();
+    lassoEndX = (e.clientX - cr.left - wfPanX) / wfZoom;
+    lassoEndY = (e.clientY - cr.top - wfPanY) / wfZoom;
+    const lx = Math.min(lassoStartX, lassoEndX), ly = Math.min(lassoStartY, lassoEndY);
+    const w = Math.abs(lassoEndX - lassoStartX), h = Math.abs(lassoEndY - lassoStartY);
+    const lassoEl = document.getElementById('wfLasso');
+    if (lassoEl) {
+      lassoEl.style.left = (lx * wfZoom + wfPanX) + 'px';
+      lassoEl.style.top = (ly * wfZoom + wfPanY) + 'px';
+      lassoEl.style.width = (w * wfZoom) + 'px';
+      lassoEl.style.height = (h * wfZoom) + 'px';
+    }
   }
   if (dragLine) {
     const canvas = document.getElementById('wfCanvas');
@@ -2002,7 +2029,28 @@ function onCanvasUp(e) {
     const el = document.getElementById('wfTransform').querySelector(`[data-id="${dragNode.id}"]`);
     if (el) el.classList.remove('dragging');
     autoSaveWorkflow();
+    // Select the dragged node
+    if (!e.shiftKey) { selectedNodes.clear(); }
+    selectedNodes.add(dragNode.id);
+    renderWfNodes();
     dragNode = null;
+  }
+  if (lassoing) {
+    lassoing = false;
+    const lassoEl = document.getElementById('wfLasso');
+    if (lassoEl) lassoEl.style.display = 'none';
+    // Find nodes inside lasso rectangle
+    const lx = Math.min(lassoStartX, lassoEndX), ly = Math.min(lassoStartY, lassoEndY);
+    const rx = Math.max(lassoStartX, lassoEndX), ry = Math.max(lassoStartY, lassoEndY);
+    if (Math.abs(rx-lx) > 5 || Math.abs(ry-ly) > 5) {
+      if (!e.shiftKey) selectedNodes.clear();
+      wfNodes.forEach(n => {
+        if (n.x >= lx && n.x + 150 <= rx && n.y >= ly && n.y + 60 <= ry) {
+          selectedNodes.add(n.id);
+        }
+      });
+    }
+    renderWfNodes();
   }
   if (dragLine) {
     const target = document.elementFromPoint(e.clientX, e.clientY);
@@ -2021,6 +2069,7 @@ function onCanvasUp(e) {
 }
 
 function onCanvasDown(e) {
+  closeCtxMenu();
   // Ctrl+click or middle button = pan
   if (e.ctrlKey || e.metaKey || e.button === 1) {
     panning = true;
@@ -2028,8 +2077,22 @@ function onCanvasDown(e) {
     e.preventDefault();
     return;
   }
-  if (e.target === document.getElementById('wfCanvas') || e.target.id === 'wfSvg' || e.target.id === 'wfTransform') {
-    dragLine = null; drawWf();
+  // Click on empty canvas → start lasso
+  const canvas = document.getElementById('wfCanvas');
+  if (e.target === canvas || e.target.id === 'wfSvg' || e.target.id === 'wfTransform') {
+    dragLine = null;
+    // Clear selection if not holding Shift
+    if (!e.shiftKey) { selectedNodes.clear(); renderWfNodes(); }
+    lassoing = true;
+    const cr = canvas.getBoundingClientRect();
+    lassoStartX = (e.clientX - cr.left - wfPanX) / wfZoom;
+    lassoStartY = (e.clientY - cr.top - wfPanY) / wfZoom;
+    lassoEndX = lassoStartX; lassoEndY = lassoStartY;
+    // Create or show lasso element
+    let lassoEl = document.getElementById('wfLasso');
+    if (!lassoEl) { lassoEl = document.createElement('div'); lassoEl.id = 'wfLasso'; lassoEl.className = 'wf-lasso'; canvas.appendChild(lassoEl); }
+    lassoEl.style.display = 'block';
+    drawWf();
   }
 }
 
