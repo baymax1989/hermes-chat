@@ -2650,10 +2650,14 @@ async function runSingleNode(nodeId) {
     let output;
     // search/extract/write/terminal → 走服务端专用端点
     if (['search','extract','write','terminal'].includes(action)) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 120s timeout
       const wfRes = await fetch('/api/wf-execute', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, params: node.params || {}, context: upstreamContext })
+        body: JSON.stringify({ action, params: node.params || {}, context: upstreamContext }),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       const wfData = await wfRes.json();
       output = wfData.ok ? wfData.output : ('❌ ' + (wfData.error || '失败'));
     } else {
@@ -2681,11 +2685,12 @@ async function runSingleNode(nodeId) {
     contentEl.innerHTML = `<div style="color:var(--green);margin-bottom:8px">✅ ${node.name} 执行完成</div>
       <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px;max-height:400px;overflow-y:auto;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word">${escapeHtml(output)}</div>`;
   } catch(e) {
-    nodeResults[nodeId] = { output: null, error: e.message, ts: Date.now() };
+    const errMsg = e.name === 'AbortError' ? '⏱️ 请求超时（120s）' : e.message;
+    nodeResults[nodeId] = { output: null, error: errMsg, ts: Date.now() };
     if (nodeEl) { nodeEl.classList.remove('running'); nodeEl.classList.add('error'); }
     const btn = nodeEl?.querySelector('.node-run');
     if (btn) btn.classList.remove('running');
-    contentEl.innerHTML = `<div style="color:var(--danger)">❌ ${node.name} 失败: ${escapeHtml(e.message)}</div>`;
+    contentEl.innerHTML = `<div style="color:var(--danger)">❌ ${node.name} 失败: ${escapeHtml(errMsg)}</div>`;
   }
 }
 
@@ -2884,10 +2889,14 @@ async function runWorkflow(startNodeId) {
     try {
       let output;
       if (['search','extract','write','terminal'].includes(action)) {
+        const ctrl = new AbortController();
+        const tmr = setTimeout(() => ctrl.abort(), 120000);
         const wfRes = await fetch('/api/wf-execute', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action, params: node.params || {}, context })
+          body: JSON.stringify({ action, params: node.params || {}, context }),
+          signal: ctrl.signal
         });
+        clearTimeout(tmr);
         const wfData = await wfRes.json();
         output = wfData.ok ? wfData.output : ('❌ ' + (wfData.error || '失败'));
       } else {
@@ -2920,10 +2929,11 @@ async function runWorkflow(startNodeId) {
       wfStatus[nid] = { status: 'done', elapsed: (Date.now() - _startTime) / 1000, output, error: null };
       if (nodeEl) { const stats = nodeEl.querySelector('.node-stats'); if (stats) stats.innerHTML = '<span style="color:var(--green)">✓</span> ' + ((Date.now() - _startTime) / 1000).toFixed(1) + 's'; }
     } catch(e) {
+      const errMsg = e.name === 'AbortError' ? '⏱️ 请求超时（120s）' : e.message;
       if (nodeEl) { nodeEl.classList.remove('running'); nodeEl.classList.add('error'); }
-      results.push({ name: node.name, output: null, error: e.message });
-      nodeResults[node.id] = { output: null, error: e.message, ts: Date.now() };
-      wfStatus[nid] = { status: 'error', elapsed: (Date.now() - _startTime) / 1000, output: null, error: e.message };
+      results.push({ name: node.name, output: null, error: errMsg });
+      nodeResults[node.id] = { output: null, error: errMsg, ts: Date.now() };
+      wfStatus[nid] = { status: 'error', elapsed: (Date.now() - _startTime) / 1000, output: null, error: errMsg };
       if (nodeEl) { const stats = nodeEl.querySelector('.node-stats'); if (stats) stats.innerHTML = '<span style="color:var(--danger)">✗</span> ' + ((Date.now() - _startTime) / 1000).toFixed(1) + 's'; }
     }
     })());
