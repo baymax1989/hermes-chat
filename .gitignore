@@ -4,3 +4,4 @@ __pycache__/
 *.log
 output/
 /tmp/
+.DS_Store
