@@ -637,9 +637,13 @@ if __name__ == "__main__":
     # Start scheduler thread
     sched = threading.Thread(target=scheduler_loop, daemon=True)
     sched.start()
-    server = http.server.HTTPServer(("127.0.0.1", PORT), ProxyHandler)
+    import socketserver
+    class ThreadedHTTPServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
+        allow_reuse_address = True
+        daemon_threads = True
+    server = ThreadedHTTPServer(("127.0.0.1", PORT), ProxyHandler)
     print(f"🐱 Hermes Chat → http://localhost:{PORT}")
-    print(f"   代理 → {API_BASE} | 数字员工引擎已启动")
+    print(f"   代理 → {API_BASE} | 数字员工引擎已启动 | 多线程模式")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
